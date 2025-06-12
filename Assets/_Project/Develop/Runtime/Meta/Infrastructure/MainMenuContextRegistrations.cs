@@ -1,6 +1,7 @@
 ﻿using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.AssetsManagement;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
+using Assets._Project.Develop.Runtime.Utilities.Updater;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
@@ -9,15 +10,22 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
     {
         public static void Process(DIContainer container)
         {
-            container.RegisterAsSingle(CreateInputHandler);
+            container.RegisterAsSingle(CreateUpdater);
+            container.RegisterAsSingle(CreateModeInputHandler);
         }
 
-        private static ModeInputHandler CreateInputHandler(DIContainer container)
+        private static NonMonoBehUpdater CreateUpdater(DIContainer container)
         {
             ResourcesAssetsLoader resourcesAssetsLoader = container.Resolve<ResourcesAssetsLoader>();
-            ModeInputHandler modeInputHandlerPrefab = resourcesAssetsLoader.Load<ModeInputHandler>("Utilities/ModeInputHandler");
-            ModeInputHandler handler = Object.Instantiate(modeInputHandlerPrefab);
-            handler.Initialize(container.Resolve<SceneSwitcherService>(),
+            NonMonoBehUpdater updaterPrefab = resourcesAssetsLoader.Load<NonMonoBehUpdater>("Utilities/NonMonoBehUpdater");
+            NonMonoBehUpdater updater = Object.Instantiate(updaterPrefab);
+            return updater;
+        }
+
+        private static ModeInputHandler CreateModeInputHandler(DIContainer container)
+        {
+            ModeInputHandler handler = new ModeInputHandler(
+                container.Resolve<SceneSwitcherService>(),
                 container.Resolve<ICoroutinePerformer>());
 
             return handler;

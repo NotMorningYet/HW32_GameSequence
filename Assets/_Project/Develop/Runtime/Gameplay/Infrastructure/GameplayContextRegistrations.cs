@@ -3,6 +3,7 @@ using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.AssetsManagement;
 using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
+using Assets._Project.Develop.Runtime.Utilities.Updater;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -19,17 +20,19 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
             container.RegisterAsSingle(CreateGameInputHanlder);
             container.RegisterAsSingle(CreateGameFinisher);
             container.RegisterAsSingle(CreateGameResultView);
+            container.RegisterAsSingle(CreateUpdater);
         }
 
-        private static GameInputHandler CreateGameInputHanlder(DIContainer container)
+        private static NonMonoBehUpdater CreateUpdater(DIContainer container)
         {
             ResourcesAssetsLoader resourcesAssetsLoader = container.Resolve<ResourcesAssetsLoader>();
-            GameInputHandler gameInputHandlerPrefab = resourcesAssetsLoader.Load<GameInputHandler>("Utilities/GameInputHandler");
-            GameInputHandler handler = Object.Instantiate(gameInputHandlerPrefab);
-            handler.Initialize(container.Resolve<GameReferee>());
-
-            return handler;
+            NonMonoBehUpdater updaterPrefab = resourcesAssetsLoader.Load<NonMonoBehUpdater>("Utilities/NonMonoBehUpdater");
+            NonMonoBehUpdater updater = Object.Instantiate(updaterPrefab);
+            return updater;
         }
+
+        private static GameInputHandler CreateGameInputHanlder(DIContainer container) 
+            => new GameInputHandler(container.Resolve<GameReferee>());                                
 
         private static SequenceGenerator CreateSequenceGenerator(DIContainer container)
             => new SequenceGenerator(container.Resolve<ConfigsProviderService>());

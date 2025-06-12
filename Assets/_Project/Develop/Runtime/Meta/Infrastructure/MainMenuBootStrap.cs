@@ -1,7 +1,11 @@
 ﻿using Assets._Project.Develop.Runtime.Infrastructure;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
+using Assets._Project.Develop.Runtime.Meta.Features.Wallet;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
+using Assets._Project.Develop.Runtime.Utilities.Updater;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
@@ -9,7 +13,9 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
     public class MainMenuBootStrap : SceneBootStrap
     {
         private DIContainer _container;
-        private ModeInputHandler _inputHandler;
+        private NonMonoBehUpdater _updater;
+        private ModeInputHandler _modeInputHandler;
+        private WalletService _walletService;
 
         public override void ProcessRegistrations(DIContainer container, IInputSceneArgs sceneArgs = null)
         {
@@ -20,7 +26,11 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
 
         public override IEnumerator Initialize()
         {
-            _inputHandler = _container.Resolve<ModeInputHandler>();
+            _updater = _container.Resolve<NonMonoBehUpdater>();
+            _modeInputHandler = _container.Resolve<ModeInputHandler>();
+            _updater.Add(_modeInputHandler);
+
+            _walletService = _container.Resolve<WalletService>();
             yield break;
         }
 

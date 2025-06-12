@@ -1,22 +1,23 @@
 ﻿using Assets._Project.Develop.Runtime.Gameplay;
 using Assets._Project.Develop.Runtime.Gameplay.Infrastructure;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
+using Assets._Project.Develop.Runtime.Utilities.Updater;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
 {
-    public class ModeInputHandler : MonoBehaviour
+    public class ModeInputHandler : IUpdatable
     {
         private SceneSwitcherService _sceneSwitcherService;
         private ICoroutinePerformer _coroutinePerformer;
 
-        public void Initialize(SceneSwitcherService sceneSwithcer, ICoroutinePerformer coroutinePerformer)
+        public ModeInputHandler(SceneSwitcherService sceneSwithcer, ICoroutinePerformer coroutinePerformer)
         {
             _coroutinePerformer = coroutinePerformer;
             _sceneSwitcherService = sceneSwithcer;
         }
 
-        private void Update()
+        public void Update()
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
                 GoToPlay(ModeType.Digital);

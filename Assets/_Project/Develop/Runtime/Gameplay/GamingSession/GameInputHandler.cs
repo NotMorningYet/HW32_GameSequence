@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Assets._Project.Develop.Runtime.Utilities.Updater;
+using System;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay
 {
-    public class GameInputHandler : MonoBehaviour, IDisposable
+    public class GameInputHandler : IUpdatable, IDisposable
     {
         public event Action AfterWonMainMenuKeyPressed;
         public event Action AfterLostRestartKeyPressed;
@@ -15,16 +16,23 @@ namespace Assets._Project.Develop.Runtime.Gameplay
         private KeyCode _mainMenuKeyCode = KeyCode.Space;
         private KeyCode _restartKeyCode = KeyCode.Space;
 
-        public void Initialize(GameReferee gameReferee)
+        public GameInputHandler(GameReferee gameReferee)
+        {
+            _gameReferee = gameReferee;
+            Initialize();
+        }
+
+        private void Initialize()
         {
             _isWorking = false;
             _isWon = false;
             _isLost = false;
-            _gameReferee = gameReferee;
+   
             _gameReferee.WinGame += OnLooseGame;
             _gameReferee.LostGame += OnWinGame;
         }
-
+            
+            
         private void OnWinGame()
         {
             _isLost = true;
@@ -35,7 +43,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay
             _isWon = true;
         }
 
-        private void Update()
+        public void Update()
         {
             if (_isWorking == false)
                 return;
@@ -78,9 +86,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay
 
             _gameReferee.WinGame -= OnLooseGame;
             _gameReferee.LostGame -= OnWinGame;
-
-            if (gameObject != null)
-                Destroy(gameObject);
         }
     }
 }
