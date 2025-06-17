@@ -1,21 +1,18 @@
 ﻿using Assets._Project.Develop.Runtime.Infrastructure;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
-using Assets._Project.Develop.Runtime.Meta.Features.Wallet;
+using Assets._Project.Develop.Runtime.Meta.Features.MainMenuInput;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
 using Assets._Project.Develop.Runtime.Utilities.Updater;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
 {
-    public class MainMenuBootStrap : SceneBootStrap
+    public class MainMenuBootStrap : SceneBootStrap, IDisposable
     {
         private DIContainer _container;
-        private NonMonoBehUpdater _updater;
-        private ModeInputHandler _modeInputHandler;
-        private WalletService _walletService;
+        private MainMenuInformator _mainMenuInformator;
 
         public override void ProcessRegistrations(DIContainer container, IInputSceneArgs sceneArgs = null)
         {
@@ -25,19 +22,19 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
         }
 
         public override IEnumerator Initialize()
-        {
-            _updater = _container.Resolve<NonMonoBehUpdater>();
-            _modeInputHandler = _container.Resolve<ModeInputHandler>();
-            _updater.Add(_modeInputHandler);
-
-            _walletService = _container.Resolve<WalletService>();
+        {            
+            _mainMenuInformator = _container.Resolve<MainMenuInformator>();
             yield break;
         }
 
         public override void Run()
         {
-            Debug.Log("Press 1 to begin Digital sequence Game");
-            Debug.Log("Press 2 to begin Literal sequence Game");
+            _mainMenuInformator.ShowInfo();
+        }
+
+        public void Dispose()
+        {
+            _container.Dispose();
         }
     }
 }

@@ -3,7 +3,6 @@ using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.LoadingScreen;
 using System.Collections;
 using System;
-using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Assets._Project.Develop.Runtime.Utilities.SceneManagement
@@ -27,6 +26,9 @@ namespace Assets._Project.Develop.Runtime.Utilities.SceneManagement
         public IEnumerator ProcessSwitchTo(string sceneName, IInputSceneArgs sceneArgs = null)
         {
             _loadingScreen.Show();
+
+            DisposeOldScene();
+
             yield return _sceneLoaderService.LoadAsync(Scenes.Empty);
             yield return _sceneLoaderService.LoadAsync(sceneName);
 
@@ -38,12 +40,22 @@ namespace Assets._Project.Develop.Runtime.Utilities.SceneManagement
             DIContainer sceneContainer = new DIContainer(_projectContainer);
 
             sceneBootStrap.ProcessRegistrations(sceneContainer, sceneArgs);
+
+            sceneContainer.Initiaize();
             
             yield return sceneBootStrap.Initialize();
 
             _loadingScreen.Hide();            
 
             sceneBootStrap.Run();
+        }
+
+        private void DisposeOldScene()
+        {
+            var oldBootStrap = Object.FindObjectOfType<SceneBootStrap>();
+
+            if (oldBootStrap is IDisposable disposableBootStrap)
+                disposableBootStrap.Dispose();
         }
     }
 }

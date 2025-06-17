@@ -1,5 +1,9 @@
 ﻿using Assets._Project.Develop.Runtime.Infrastructure.DI;
+using Assets._Project.Develop.Runtime.Meta.Features.ScoreCount;
+using Assets._Project.Develop.Runtime.Meta.Features.Wallet;
+using Assets._Project.Develop.Runtime.Meta.Infrastructure;
 using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
+using Assets._Project.Develop.Runtime.Utilities.DataManagement.DataProviders;
 using Assets._Project.Develop.Runtime.Utilities.LoadingScreen;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
 using System.Collections;
@@ -17,6 +21,8 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.EntryPoint
 
             ProjectContextRegistrations.Process(projectContainer);
 
+            projectContainer.Initiaize();
+
             projectContainer.Resolve<ICoroutinePerformer>().StartPerform(Initialize(projectContainer));
         }
 
@@ -30,11 +36,25 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.EntryPoint
         {
             ILoadingScreen loadingScreen = container.Resolve<ILoadingScreen>();
             SceneSwitcherService sceneSwitcherService = container.Resolve<SceneSwitcherService>();
+            ScoreDataProvider scoreDataProvider = container.Resolve<ScoreDataProvider>();
+            GameFinishEventMaker gameFinishEventMaker = container.Resolve<GameFinishEventMaker>();
+
             loadingScreen.Show();
 
             Debug.Log("Начало инициалзации сервисов");
 
             yield return container.Resolve<ConfigsProviderService>().LoadAsync();
+
+            WalletService walletService = container.Resolve<WalletService>();
+            bool isScoreDataSaveExists = false;
+
+            yield return scoreDataProvider.Exists(result => isScoreDataSaveExists = result);
+
+            container.Resolve<ScoreCounter>();
+
+            if (isScoreDataSaveExists)
+                yield return scoreDataProvider.Load();
+            else scoreDataProvider.Reset();
 
             loadingScreen.Hide();
 

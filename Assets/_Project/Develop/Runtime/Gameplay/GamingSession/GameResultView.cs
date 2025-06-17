@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets._Project.Develop.Runtime.Meta.Infrastructure;
+using System;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.GamingSession
@@ -7,14 +8,14 @@ namespace Assets._Project.Develop.Runtime.Gameplay.GamingSession
     {
         private readonly string _winMessage = "Победа. Нажмите Пробел для выхода в Главное меню";
         private readonly string _looseMessage = "Поражение. Нажмите пробел, чтобы попробовать еще раз";
-        private GameReferee _gameReferee;
+        private GameFinishEventMaker _gameFinishEventMaker;
 
-        public GameResultView(GameReferee gameReferee)
+        public GameResultView(GameFinishEventMaker eventmaker)
         {
-            _gameReferee = gameReferee;
+            _gameFinishEventMaker = eventmaker;
 
-            _gameReferee.WinGame += OnWinGame;
-            _gameReferee.LostGame += OnLooseGame;
+            _gameFinishEventMaker.Win += OnWinGame;
+            _gameFinishEventMaker.Lost += OnLooseGame;
         }
 
         private void OnWinGame()
@@ -29,8 +30,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay.GamingSession
 
         public void Dispose()
         {
-            _gameReferee.WinGame -= OnWinGame;
-            _gameReferee.LostGame -= OnLooseGame;
+            _gameFinishEventMaker.Win -= OnWinGame;
+            _gameFinishEventMaker.Lost -= OnLooseGame;
         }
     }
 }

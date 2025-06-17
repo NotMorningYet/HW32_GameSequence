@@ -1,5 +1,8 @@
 ﻿using Assets._Project.Develop.Runtime.Gameplay.GamingSession;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
+using Assets._Project.Develop.Runtime.Meta.Features.BonusPenaltiesSystem;
+using Assets._Project.Develop.Runtime.Meta.Features.Wallet;
+using Assets._Project.Develop.Runtime.Meta.Infrastructure;
 using Assets._Project.Develop.Runtime.Utilities.AssetsManagement;
 using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
@@ -20,8 +23,16 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
             container.RegisterAsSingle(CreateGameInputHanlder);
             container.RegisterAsSingle(CreateGameFinisher);
             container.RegisterAsSingle(CreateGameResultView);
-            container.RegisterAsSingle(CreateUpdater);
+            container.RegisterAsSingle(CreateResultToMoneyConverter);
+            container.RegisterAsSingle(CreateUpdater).NonLazy();
         }
+
+        private static ResultToMoneyConverter CreateResultToMoneyConverter(DIContainer container)
+            => new ResultToMoneyConverter(
+                container.Resolve<GameFinishEventMaker>(),
+                container.Resolve<ConfigsProviderService>(),
+                container.Resolve<WalletService>()
+                );
 
         private static NonMonoBehUpdater CreateUpdater(DIContainer container)
         {
@@ -32,7 +43,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
         }
 
         private static GameInputHandler CreateGameInputHanlder(DIContainer container) 
-            => new GameInputHandler(container.Resolve<GameReferee>());                                
+            => new GameInputHandler(container.Resolve<GameFinishEventMaker>(), container.Resolve<NonMonoBehUpdater>(), container.Resolve<GameReferee>());                                
 
         private static SequenceGenerator CreateSequenceGenerator(DIContainer container)
             => new SequenceGenerator(container.Resolve<ConfigsProviderService>());
@@ -52,10 +63,10 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
                 );
 
         private static GameReferee CreateGameReferee(DIContainer container)
-            => new GameReferee();
+            => new GameReferee(container.Resolve<GameFinishEventMaker>());
 
         private static GameResultView CreateGameResultView(DIContainer container)
-            =>new GameResultView(container.Resolve<GameReferee>());
+            =>new GameResultView(container.Resolve<GameFinishEventMaker>());
            
     }
 

@@ -23,7 +23,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay
         public void StartGame(ModeType type)
         {
             _modeType = type;
-            Debug.Log($"type ={type}");
             string _currentSequence = new(_sequenceGenerator.GenerateSequence(_modeType));
             Debug.Log($"Последовательность: {_currentSequence}");
             _gameReferee.SetSequence(_currentSequence);

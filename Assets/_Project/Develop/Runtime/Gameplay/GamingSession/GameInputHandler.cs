@@ -1,4 +1,5 @@
-﻿using Assets._Project.Develop.Runtime.Utilities.Updater;
+﻿using Assets._Project.Develop.Runtime.Meta.Infrastructure;
+using Assets._Project.Develop.Runtime.Utilities.Updater;
 using System;
 using UnityEngine;
 
@@ -9,16 +10,20 @@ namespace Assets._Project.Develop.Runtime.Gameplay
         public event Action AfterWonMainMenuKeyPressed;
         public event Action AfterLostRestartKeyPressed;
 
+        private GameFinishEventMaker _gameFinishEventMaker;
         private GameReferee _gameReferee;
+        private NonMonoBehUpdater _updater;
         private bool _isWorking;
         private bool _isWon;
         private bool _isLost;
         private KeyCode _mainMenuKeyCode = KeyCode.Space;
         private KeyCode _restartKeyCode = KeyCode.Space;
 
-        public GameInputHandler(GameReferee gameReferee)
+        public GameInputHandler(GameFinishEventMaker gameFinishEventMaker, NonMonoBehUpdater updater, GameReferee gameReferee)
         {
             _gameReferee = gameReferee;
+            _gameFinishEventMaker = gameFinishEventMaker;
+            _updater = updater;
             Initialize();
         }
 
@@ -28,19 +33,20 @@ namespace Assets._Project.Develop.Runtime.Gameplay
             _isWon = false;
             _isLost = false;
    
-            _gameReferee.WinGame += OnLooseGame;
-            _gameReferee.LostGame += OnWinGame;
+            _updater.Add(this);
+            _gameFinishEventMaker.Win += OnWinGame;
+            _gameFinishEventMaker.Lost += OnLooseGame;
         }
             
             
         private void OnWinGame()
         {
-            _isLost = true;
+            _isWon = true;
         }
 
         private void OnLooseGame()
         {
-            _isWon = true;
+            _isLost = true;
         }
 
         public void Update()
@@ -84,8 +90,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay
             AfterLostRestartKeyPressed = null;
             AfterWonMainMenuKeyPressed = null;
 
-            _gameReferee.WinGame -= OnLooseGame;
-            _gameReferee.LostGame -= OnWinGame;
+            _gameFinishEventMaker.Win -= OnWinGame;
+            _gameFinishEventMaker.Lost -= OnLooseGame;
         }
     }
 }

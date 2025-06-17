@@ -9,12 +9,13 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
     public class ModeInputHandler : IUpdatable
     {
         private SceneSwitcherService _sceneSwitcherService;
-        private ICoroutinePerformer _coroutinePerformer;
+        private ICoroutinePerformer _coroutinePerformer;        
 
-        public ModeInputHandler(SceneSwitcherService sceneSwithcer, ICoroutinePerformer coroutinePerformer)
+        public ModeInputHandler(SceneSwitcherService sceneSwithcer, ICoroutinePerformer coroutinePerformer, NonMonoBehUpdater updater)
         {
             _coroutinePerformer = coroutinePerformer;
-            _sceneSwitcherService = sceneSwithcer;
+            _sceneSwitcherService = sceneSwithcer;            
+            updater.Add(this);
         }
 
         public void Update()

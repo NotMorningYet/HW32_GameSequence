@@ -1,19 +1,18 @@
-﻿using System;
+﻿using Assets._Project.Develop.Runtime.Meta.Infrastructure;
 
 namespace Assets._Project.Develop.Runtime.Gameplay
 {
-    public class GameReferee : IDisposable
+    public class GameReferee 
     {
-        public event Action LostGame;
-        public event Action WinGame;
-                
+        private GameFinishEventMaker _gameFinishEventMaker;
         private string _sequence;
         private int _length;
         private int _currentindex;
         
 
-        public GameReferee()
+        public GameReferee(GameFinishEventMaker eventmaker)
         {
+            _gameFinishEventMaker = eventmaker;
             _sequence = string.Empty;
             _length = _sequence.Length;
             _currentindex = 0;
@@ -30,7 +29,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay
         {
             if (input != _sequence[_currentindex])
             {
-                LostGame?.Invoke();
+                _gameFinishEventMaker.TriggerLost();
                 return;
             }
             else
@@ -40,14 +39,8 @@ namespace Assets._Project.Develop.Runtime.Gameplay
 
             if (_currentindex == _length)
             {
-                WinGame?.Invoke();
+                _gameFinishEventMaker.TriggerWin();
             }
-        }
-
-        public void Dispose()
-        {
-            LostGame = null;
-            WinGame = null;
         }
     }
 }

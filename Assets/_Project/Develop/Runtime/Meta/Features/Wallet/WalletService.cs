@@ -1,20 +1,43 @@
-﻿using Assets._Project.Develop.Runtime.Utilities.Reactive;
+﻿using Assets._Project.Develop.Runtime.Configs.Meta.Wallet;
+using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
+using Assets._Project.Develop.Runtime.Utilities.Reactive;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Meta.Features.Wallet
 {
-    public class WalletService
+    public class WalletService 
     {
         private readonly Dictionary<CurrencyType, ReactiveVariable<int>> _currencies;
+        private readonly ConfigsProviderService _configProvider;
 
-        public WalletService(Dictionary<CurrencyType, ReactiveVariable<int>> currenies)
+        public WalletService(
+            Dictionary<CurrencyType, ReactiveVariable<int>> currencies,            
+            ConfigsProviderService configsProviderService)
         {
-            _currencies = new Dictionary<CurrencyType, ReactiveVariable<int>>(currenies);
-        }   
+            _currencies = new Dictionary<CurrencyType, ReactiveVariable<int>>(currencies);
+            _configProvider = configsProviderService;            
+
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            StartWalletConfig config = _configProvider.GetConfig<StartWalletConfig>();
+
+            foreach (var currencyConfig in config.GetAllCurrencies())
+            {
+                CurrencyType currencyType = currencyConfig.Type;
+                int value = currencyConfig.Value;
+
+                if (_currencies.ContainsKey(currencyType))
+                    _currencies[currencyType].Value = value;
+                else
+                    _currencies.Add(currencyType, new ReactiveVariable<int>(value));
+            }
+        }
 
         public List<CurrencyType> AvailableCurrencies => _currencies.Keys.ToList();
 
@@ -39,7 +62,10 @@ namespace Assets._Project.Develop.Runtime.Meta.Features.Wallet
         public void Spend(CurrencyType type, int amount)
         {
             if(IsEnough(type, amount) == false)
-                throw new InvalidOperationException("Not enough: " + type.ToString());
+            {
+                Debug.Log("Not enough: " + type.ToString());
+                return;
+            }
 
             if (amount < 0)
                 throw new ArgumentOutOfRangeException(nameof(amount));

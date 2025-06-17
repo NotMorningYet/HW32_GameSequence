@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Infrastructure.DI
 {
@@ -19,7 +20,7 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.DI
 
         public DIContainer() : this(null) { }
 
-        public void RegisterAsSingle<T>(Func<DIContainer, T> creator)
+        public IRegistrationOptions RegisterAsSingle<T>(Func<DIContainer, T> creator)
         {
             if (IsAlreadyRegistered<T>())
             {
@@ -37,6 +38,8 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.DI
             });
 
             _container.Add(typeof(T), registration);
+
+            return registration;
         }
 
         public bool IsAlreadyRegistered<T>()
@@ -85,6 +88,15 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.DI
             _requests.Clear();
 
             _disposed = true;
+        }
+
+        public void Initiaize()
+        {
+            foreach (Registration registration in _container.Values)
+            {
+                if (registration.IsNonLazy)
+                    registration.CreateInstanceFrom(this);
+            }
         }
     }
 }
