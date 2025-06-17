@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _shopItems:
   - _name: ResetScore
-    _price: 6
+    _price: 25
     _currencyType: 0

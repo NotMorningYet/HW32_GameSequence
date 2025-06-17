@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _winValues:
   - <Type>k__BackingField: 0
-    <Value>k__BackingField: 5
+    <Value>k__BackingField: 13
   _lostValues:
   - <Type>k__BackingField: 0
-    <Value>k__BackingField: 3
+    <Value>k__BackingField: 7
